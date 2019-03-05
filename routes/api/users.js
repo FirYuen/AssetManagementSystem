@@ -6,6 +6,7 @@ var User = require('../../models/User');
 var jwt = require('jsonwebtoken')
 var gravatar = require('gravatar')
 var keys = require('../../config/keys')
+var passport = require('passport')
 
 // @route GET api/users/test
 // @desc 返回的请求的json数据
@@ -16,7 +17,7 @@ router.get("/test", (req, res) => {
     });
 })
 
-// @route post api/users/register
+// @route POST api/users/register
 // @desc 返回的请求的json数据
 // @access public
 router.post("/register", (req, res) => {
@@ -62,7 +63,7 @@ router.post("/register", (req, res) => {
 
 })
 
-// @route post api/users/login
+// @route POST api/users/login
 // @desc 返回token jwt passport
 // @access public
 
@@ -95,7 +96,7 @@ router.post("/login", (req, res) => {
                                 if (err) throw err;
                                 res.json({
                                     success: true,
-                                    token: 'AMS' + token
+                                    token: 'Bearer ' + token
                                 })
                             })
                             //res.json({msg:'success!'})
@@ -108,6 +109,21 @@ router.post("/login", (req, res) => {
                     })
             }
         })
+})
+
+// @route GET api/users/current
+// @desc return current user
+// @access Private
+
+router.get('/userInfo', passport.authenticate("jwt", {
+    session: false
+}), (req, res) => {
+    res.json({
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.name,
+        avatar: req.user.avatar
+    })
 })
 
 module.exports = router;
