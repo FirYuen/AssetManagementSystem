@@ -3,6 +3,33 @@
     <section class="form_container">
       <div class="manage_tip">
         <span class="title">后台管理系统</span>
+        <el-form :model="registerUser" ref="registerForm" label-width="80px" class="registerForm">
+          <el-form-item label="用户名" prop="name">
+            <el-input v-model="registerUser.name" placeholder="请输入用户名"></el-input>
+          </el-form-item>
+
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="registerUser.email" placeholder="请输入邮箱"></el-input>
+          </el-form-item>
+
+          <el-form-item label="密码" prop="pass">
+            <el-input type="password" v-model="registerUser.pass" placeholder="请输入密码"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="checkpass">
+            <el-input type="password" v-model="registerUser.pass2" placeholder="请再次输入密码"></el-input>
+          </el-form-item>
+
+          <el-form-item label="注册身份" prop="identity ">
+            <el-select v-model="registerUser.identity" placeholder="请选择身份">
+              <el-option label="员工" value="employee"></el-option>
+              <el-option label="管理员" value="employee"></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">提交</el-button>
+          </el-form-item>
+        </el-form>
       </div>
     </section>
   </div>
@@ -11,7 +38,17 @@
 <script>
 export default {
   name: "register",
-  components: {}
+  data() {
+    return {
+      registerUser: {
+        user: "",
+        email: "",
+        pass: "",
+        checkpass: "",
+        identity: ""
+      }
+    };
+  }
 };
 </script>
 
