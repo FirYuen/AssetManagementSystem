@@ -3,7 +3,13 @@
     <section class="form_container">
       <div class="manage_tip">
         <span class="title">后台管理系统</span>
-        <el-form :model="registerUser" ref="registerForm" label-width="80px" class="registerForm">
+        <el-form
+          :model="registerUser"
+          :rules="rules"
+          ref="registerForm"
+          label-width="80px"
+          class="registerForm"
+        >
           <el-form-item label="用户名" prop="name">
             <el-input v-model="registerUser.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
@@ -16,7 +22,7 @@
             <el-input type="password" v-model="registerUser.pass" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="checkpass">
-            <el-input type="password" v-model="registerUser.pass2" placeholder="请再次输入密码"></el-input>
+            <el-input type="password" v-model="registerUser.checkpass" placeholder="请再次输入密码"></el-input>
           </el-form-item>
 
           <el-form-item label="注册身份" prop="identity ">
@@ -39,6 +45,13 @@
 export default {
   name: "register",
   data() {
+    var validatePass2 = (rule, value, callback) => {
+      if (value !== this.registerUser.pass) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
     return {
       registerUser: {
         user: "",
@@ -46,9 +59,33 @@ export default {
         pass: "",
         checkpass: "",
         identity: ""
+      },
+      rules: {
+        name: [
+          { required: true, message: "用户名不能为空", trigger: "blur" },
+          { min: 2, max: 15, message: "用户名长度为2-15字符", trigger: "blur" }
+        ],
+        email: [
+          {
+            type: "email",
+            required: true,
+            message: "邮箱格式不正确",
+            trigger: "blur"
+          }
+        ],
+        pass: [
+          { required: true, message: "密码不能为空", trigger: "blur" },
+          { min: 6, max: 30, message: "密码长度为6-30字符", trigger: "blur" }
+        ],
+        checkpass: [
+          { required: true, message: "密码不能为空", trigger: "blur" },
+          { min: 6, max: 30, message: "密码长度为6-30字符", trigger: "blur" },
+          { validator: validatePass2, trigger: "blur" }
+        ]
       }
     };
-  }
+  },
+  methods: {}
 };
 </script>
 
