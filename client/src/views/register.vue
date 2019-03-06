@@ -28,7 +28,7 @@
           <el-form-item label="注册身份" prop="identity ">
             <el-select v-model="registerUser.identity" placeholder="请选择身份">
               <el-option label="员工" value="employee"></el-option>
-              <el-option label="管理员" value="employee"></el-option>
+              <el-option label="管理员" value="manager"></el-option>
             </el-select>
           </el-form-item>
 
@@ -81,11 +81,24 @@ export default {
           { required: true, message: "密码不能为空", trigger: "blur" },
           { min: 6, max: 30, message: "密码长度为6-30字符", trigger: "blur" },
           { validator: validatePass2, trigger: "blur" }
+        ],
+        identity: [
+          { required: true, message: "请选择注册身份", trigger: "blur" }
         ]
       }
     };
   },
-  methods: {}
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+        }
+      });
+    }
+  }
 };
 </script>
 
