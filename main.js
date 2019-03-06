@@ -5,19 +5,19 @@ var passport = require('passport')
 var app = express();
 //引入users.js
 var users = require('./routes/api/users');
-
+var profiles = require('./routes/api/profiles')
 //DB config
 var db = require('./config/keys').mongoURI;
 
 // connect to mongodb
-mongoose.connect(db,{ useNewUrlParser: true })
+mongoose.connect(db, { useNewUrlParser: true })
     .then((client) => {
         console.log('MongoDB Connected');
     })
     .catch(err => console.log(err))
 
 // 使用body-parser中间件
-app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // passport初始化
@@ -28,7 +28,8 @@ app.get('/', (req, res) => {
     res.send(db);
 })
 
-app.use('/api/users',users)
+app.use('/api/users', users);
+app.use('/api/profiles', profiles)
 
 var port = process.env.PORT || 5000;
 

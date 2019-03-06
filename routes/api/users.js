@@ -11,11 +11,11 @@ var passport = require('passport')
 // @route GET api/users/test
 // @desc 返回的请求的json数据
 // @access public
-router.get("/test", (req, res) => {
-    res.json({
-        msg: 'test succesed!'
-    });
-})
+// router.get("/test", (req, res) => {
+//     res.json({
+//         msg: 'test succesed!'
+//     });
+// })
 
 // @route POST api/users/register
 // @desc 返回的请求的json数据
@@ -24,34 +24,26 @@ router.post("/register", (req, res) => {
     //res.send(req.body)
     //console.log(req.body)
 
-    User.findOne({
-            email: req.body.email
-        })
+    User.findOne({ email: req.body.email })
         .then((user) => {
             if (user) {
                 console.log(user)
-                return res.status(400).json({
-                    email: "邮箱已经被注册！"
-                })
+                return res.status(400).json("邮箱已经被注册！")
             } else {
-                let avatarURI = gravatar.url(req.body.email, {
-                    s: '200',
-                    r: 'pg',
-                    d: 'mm'
-                })
+                let avatarURI = gravatar.url(req.body.email, { s: '200', r: 'pg', d: 'mm' })
 
                 let newUser = new User({
                     name: req.body.name,
                     email: req.body.email,
                     avatar: avatarURI,
-                    pwd: req.body.pwd
+                    pwd: req.body.pwd,
+                    identity: req.body.identity
                 })
                 //加密存储密码
                 bcrypt.genSalt(10, (err, salt) => {
                     bcrypt.hash(newUser.pwd, salt, function (err, hash) {
                         if (err) throw err;
                         newUser.pwd = hash;
-
                         newUser.save()
                             .then(user => res.json(user))
                             .catch(err => console.log(err))
@@ -71,15 +63,13 @@ router.post("/login", (req, res) => {
     let email = req.body.email;
     let pwd = req.body.pwd;
     //查询数据库
-    User.findOne({
-            email: email
-        })
+    User.findOne({ email: email })
         .then((user) => {
             if (!user) {
 
-                return res.status(404).json({
-                    email: '用户不存在'
-                });
+                return res.status(404).json(
+                    '用户不存在'
+                );
             } else {
                 //密码匹配
                 bcrypt.compare(pwd, user.pwd)
@@ -87,7 +77,9 @@ router.post("/login", (req, res) => {
                         if (isMatch) {
                             let rule = {
                                 id: user.id,
-                                name: user.name
+                                name: user.name,
+                                avatar: user.avatar,
+                                identity: user.identity
                             }
 
                             jwt.sign(rule, keys.secretKey, {
@@ -101,9 +93,9 @@ router.post("/login", (req, res) => {
                             })
                             //res.json({msg:'success!'})
                         } else {
-                            return res.status(400).json({
-                                pwd: '密码错误'
-                            });
+                            return res.status(400).json(
+                                '密码错误'
+                            );
                         }
 
                     })
@@ -122,7 +114,8 @@ router.get('/userInfo', passport.authenticate("jwt", {
         id: req.user.id,
         email: req.user.email,
         name: req.user.name,
-        avatar: req.user.avatar
+        avatar: req.user.avatar,
+        identity: req.user.identity
     })
 })
 
