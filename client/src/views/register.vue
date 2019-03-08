@@ -11,15 +11,15 @@
           class="registerForm"
         >
           <el-form-item label="用户名" prop="name">
-            <el-input v-model="registerUser.name" placeholder="请输入用户名"></el-input>
+            <el-input v-model="registerUser.name" placeholder="请输入用户名" class="name"></el-input>
           </el-form-item>
 
           <el-form-item label="邮箱" prop="email">
-            <el-input v-model="registerUser.email" placeholder="请输入邮箱"></el-input>
+            <el-input v-model="registerUser.email" placeholder="请输入邮箱" class="email"></el-input>
           </el-form-item>
 
-          <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="registerUser.pass" placeholder="请输入密码"></el-input>
+          <el-form-item label="密码" prop="pwd">
+            <el-input type="password" v-model="registerUser.pwd" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="checkpass">
             <el-input type="password" v-model="registerUser.checkpass" placeholder="请再次输入密码"></el-input>
@@ -35,6 +35,11 @@
           <el-form-item>
             <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">提交</el-button>
           </el-form-item>
+          <div class="tiparea">
+            <p>已有账号?现在
+              <router-link to="/login">登录</router-link>
+            </p>
+          </div>
         </el-form>
       </div>
     </section>
@@ -46,7 +51,7 @@ export default {
   name: "register",
   data() {
     var validatePass2 = (rule, value, callback) => {
-      if (value !== this.registerUser.pass) {
+      if (value !== this.registerUser.pwd) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -54,11 +59,11 @@ export default {
     };
     return {
       registerUser: {
-        user: "",
-        email: "",
-        pass: "",
-        checkpass: "",
-        identity: ""
+        name: "123",
+        email: "123@123.com",
+        pwd: "123456",
+        checkpass: "123456",
+        identity: "employee"
       },
       rules: {
         name: [
@@ -73,7 +78,7 @@ export default {
             trigger: "blur"
           }
         ],
-        pass: [
+        pwd: [
           { required: true, message: "密码不能为空", trigger: "blur" },
           { min: 6, max: 30, message: "密码长度为6-30字符", trigger: "blur" }
         ],
@@ -92,9 +97,22 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
+          this.$axios
+            .post("/api/users/register", this.registerUser)
+            .then(response => {
+              //注册成功
+              this.$message({
+                message: "账号注册成功",
+                type: "success"
+              });
+              this.$router.push("/login");
+            })
+            .catch(err => {
+              this.$message({
+                message: err,
+                type: "error"
+              });
+            });
         }
       });
     }
@@ -136,5 +154,13 @@ export default {
 
 .submit_btn {
   width: 100%;
+}
+.tiparea {
+  text-align: right;
+  font-size: 12px;
+  color: #333;
+}
+.tiparea p a {
+  color: #409eff;
 }
 </style>
