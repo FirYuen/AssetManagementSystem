@@ -9,14 +9,12 @@ export default {
   name: "app",
   created () {
     if (localStorage.eleToken) {
-      console.log(localStorage.eleToken)
-      
       let decoded = jwtDecode(localStorage.eleToken);
       //存储token到vuex
       this.$store.dispatch("setAuthenticated", !this.isEmpty(decoded));
       this.$store.dispatch("setUser", decoded);
     }else{
-      console.log(localStorage)
+      // console.log(localStorage)
       
     }
   },
