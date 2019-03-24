@@ -21,7 +21,8 @@
           <el-form-item>
             <el-button type="primary" class="submit_btn" @click="submitForm('loginForm')">登录</el-button>
             <div class="tiparea">
-              <p>还没有账号?现在
+              <p>
+                还没有账号?现在
                 <router-link to="/register">注册</router-link>
               </p>
             </div>
@@ -33,6 +34,7 @@
 </template>
 
 <script>
+import jwtDecode from "jwt-decode";
 export default {
   name: "login",
   data() {
@@ -64,10 +66,15 @@ export default {
           this.$axios
             .post("/api/users/login", this.loginUser)
             .then(response => {
-              
+              let { token } = response.data;
+              //存储token到ls
+              localStorage.setItem("eleToken", token);
+              //解析token
+              let decoded = jwtDecode(token);
+              //存储token到vuex
+              this.$store.dispatch("setAuthenticated",!this.isEmpty(decoded))
+              this.$store.dispatch("setUser",decoded)
               this.$router.push("/index");
-              let {token} =response.data
-                localStorage.setItem("eleToken",token)
             })
             .catch(err => {
               this.$message({
@@ -77,6 +84,14 @@ export default {
             });
         }
       });
+    },
+    isEmpty(value){
+      return(
+        value === undefined||
+        value ===null||
+        (typeof value ==="object"&&Object.keys(value).length===0)||
+        (typeof value ==="string"&&value.trim().length===0) 
+      )
     }
   }
 };
