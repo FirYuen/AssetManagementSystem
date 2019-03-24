@@ -4,6 +4,8 @@ import Index from './views/index.vue';
 import Register from './views/register.vue';
 import Login from './views/login.vue'
 import NOTFOUND from './views/404.vue';
+import Home from './views/Home.vue'
+import InfoShow from './views/InfoShow.vue'
 
 Vue.use(Router)
 
@@ -18,7 +20,12 @@ const router = new Router({
         {
             path: '/index',
             name: 'index',
-            component: Index
+            component: Index,
+            children:[
+                {path:"",component:Home},
+                {path:"/home",name:"home",component:Home},
+                {path:"/infoShow",name:"infoShow",component:InfoShow}
+            ]
         },
         {
             path: '/register',
@@ -43,7 +50,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
     const isLogin = localStorage.eleToken ? true : false
-    if (to.path == "/login" || to.path == "/register") {
+    if (to.path === "/login" || to.path === "/register") {
         next()
     } else {
         isLogin ? next() : next('login')
