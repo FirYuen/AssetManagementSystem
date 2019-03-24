@@ -38,19 +38,32 @@ module.exports = {
     },
     devServer: {
         open: true,
-        host: '0.0.0.0',
+        host: '192.168.0.11',
         port: 8080,
         https: false,
         hotOnly: false,
         proxy: { // 配置跨域
+            '/mock':{
+                target:"http://yapi.demo.qunar.com/mock/",
+                ws: true,
+                changOrigin: true,
+                // logLevel: 'debug', //可以确定http-proxy是否正确代理请求地址
+                pathRewrite: {
+                    // '^/api': '',
+                    '^/mock': ''
+                }
+            },
             '/api/*': {
                 target: 'http://192.168.0.11:5000/api/',
                 ws: true,
                 changOrigin: true,
+            //    logLevel: 'debug',
                 pathRewrite: {
                     '^/api': ''
                 }
             }
+  
+            
         },
         before: app => {}
     }
