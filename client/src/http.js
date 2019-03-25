@@ -16,7 +16,7 @@ function endLoading() {
 axios.interceptors.request.use(
     config => {
        
-        if(config.params.loading===true||config.params.loading===undefined){
+        if(config.loading===true||config.loading===undefined){
             startLoading();
         }
         if (localStorage.eleToken) {
@@ -30,13 +30,16 @@ axios.interceptors.request.use(
 )
 //响应拦截
 axios.interceptors.response.use(response => {
-    if(response.config.params.loading===true||response.config.params.loading===undefined){
-        endLoading()
+    if(response.config.loading===true||response.config.loading===undefined){
+        endLoading();
     }
+   
     return response
 }, err => {
     //错误提醒
-    endLoading();
+    if(err.config.loading===true||err.config.loading===undefined){
+        endLoading();
+    }
     Message.error(err.response.data)
     //获取错误状态码并且清除eleToken
     let { statusCode } = err.response

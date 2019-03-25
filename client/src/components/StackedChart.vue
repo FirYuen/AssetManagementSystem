@@ -43,7 +43,7 @@ export default {
       this.chartData = chartData 
     },
     fetchData() {
-      this.$axios.get("/mock/57018/api/runoffxy",{params:{loading:false}}).then(resp => {
+      this.$axios.get("/mock/57018/api/runoffxy",{loading:false}).then(resp => {
         this.propData(resp.data)
       });
     }

@@ -2,6 +2,8 @@
   <div class="proptiestable">
     <template v-if="tableData.length>0">
       <el-table :data="tableData" border style="width: 100%">
+                <el-table-column prop="index" label="序号" align="center" width="70"></el-table-column>
+
         <el-table-column prop="type" label="收支类型" align="center" width="180"></el-table-column>
         <el-table-column prop="describe" label="收支描述" align="center" width="180"></el-table-column>
         <el-table-column prop="income" label="收入" align="center" width="100"></el-table-column>
@@ -27,7 +29,7 @@ export default {
     };
   },
   created() {
-    // this.fetchData();
+     this.fetchData();
   },
   methods: {
     fetchData() {
