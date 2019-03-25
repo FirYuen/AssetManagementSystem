@@ -43,12 +43,16 @@ export default {
       this.chartData = chartData 
     },
     fetchData() {
-      this.$axios.get("/mock/57018/api/runoffxy").then(resp => {
+      this.$axios.get("/mock/57018/api/runoffxy",{params:{loading:false}}).then(resp => {
         this.propData(resp.data)
       });
     }
   },
   mounted() {
+    this.fetchData();
+    setTimeout(() => {
+      this.fetchData()
+    }, 1000);
     this.initlineareachart(this.lineareachartData.chartInfo);
 
     setInterval(() => {

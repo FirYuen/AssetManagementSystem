@@ -1,9 +1,7 @@
 import axios from 'axios'
 import { Message, Loading } from "element-ui";
 import router from './router';
-
 let loading
-
 function startLoading() {
     loading = Loading.service({
         lock: true,
@@ -11,15 +9,16 @@ function startLoading() {
         background: 'rgba(0,0,0,0.7)'
     })
 }
-
 function endLoading() {
     loading.close();
 }
-
 //请求拦截
 axios.interceptors.request.use(
     config => {
-        startLoading();
+       
+        if(config.params.loading===true||config.params.loading===undefined){
+            startLoading();
+        }
         if (localStorage.eleToken) {
             //设置请求头
             config.headers.Authorization = localStorage.eleToken;
@@ -31,15 +30,14 @@ axios.interceptors.request.use(
 )
 //响应拦截
 axios.interceptors.response.use(response => {
-    endLoading()
+    if(response.config.params.loading===true||response.config.params.loading===undefined){
+        endLoading()
+    }
     return response
 }, err => {
     //错误提醒
     endLoading();
-
-
     Message.error(err.response.data)
-
     //获取错误状态码并且清除eleToken
     let { statusCode } = err.response
     if (statusCode == 401) {
@@ -48,8 +46,6 @@ axios.interceptors.response.use(response => {
         //跳转到login
         router.push('/login');
     }
-
     return Promise.reject(err)
 })
-
 export default axios
