@@ -67,31 +67,35 @@ export default {
             .post("/api/users/login", this.loginUser)
             .then(response => {
               let { token } = response.data;
+              this.$message({
+                message: "登录成功",
+                type: "success"
+              });
               //存储token到ls
               localStorage.setItem("eleToken", token);
               //解析token
               let decoded = jwtDecode(token);
               //存储token到vuex
-              this.$store.dispatch("setAuthenticated",!this.isEmpty(decoded))
-              this.$store.dispatch("setUser",decoded)
+              this.$store.dispatch("setAuthenticated", !this.isEmpty(decoded));
+              this.$store.dispatch("setUser", decoded);
               this.$router.push("/index");
             })
             .catch(err => {
               this.$message({
-                message: err,
+                message: err.response.data,
                 type: "error"
               });
             });
         }
       });
     },
-    isEmpty(value){
-      return(
-        value === undefined||
-        value ===null||
-        (typeof value ==="object"&&Object.keys(value).length===0)||
-        (typeof value ==="string"&&value.trim().length===0) 
-      )
+    isEmpty(value) {
+      return (
+        value === undefined ||
+        value === null ||
+        (typeof value === "object" && Object.keys(value).length === 0) ||
+        (typeof value === "string" && value.trim().length === 0)
+      );
     }
   }
 };

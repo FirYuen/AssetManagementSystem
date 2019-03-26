@@ -2,6 +2,7 @@ import axios from 'axios'
 import { Message, Loading } from "element-ui";
 import router from './router';
 let loading
+
 function startLoading() {
     loading = Loading.service({
         lock: true,
@@ -9,14 +10,15 @@ function startLoading() {
         background: 'rgba(0,0,0,0.7)'
     })
 }
+
 function endLoading() {
     loading.close();
 }
 //请求拦截
 axios.interceptors.request.use(
     config => {
-       
-        if(config.loading===true||config.loading===undefined){
+
+        if (config.loading === true || config.loading === undefined) {
             startLoading();
         }
         if (localStorage.eleToken) {
@@ -30,20 +32,22 @@ axios.interceptors.request.use(
 )
 //响应拦截
 axios.interceptors.response.use(response => {
-    if(response.config.loading===true||response.config.loading===undefined){
+    if (response.config.loading === true || response.config.loading === undefined) {
         endLoading();
     }
-   
+
     return response
 }, err => {
     //错误提醒
-    if(err.config.loading===true||err.config.loading===undefined){
+    if (err.config.loading === true || err.config.loading === undefined) {
         endLoading();
     }
-    Message.error(err.response.data)
+    //Message.error(err.response.data)
     //获取错误状态码并且清除eleToken
     let { statusCode } = err.response
-    if (statusCode == 401) {
+    if (statusCode !== 200) {
+        console.log(err);
+        
         Message.error("登录状态异常,请重新登录");
         localStorage.removeItem('eleToken')
         //跳转到login
