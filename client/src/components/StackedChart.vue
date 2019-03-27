@@ -67,7 +67,7 @@ export default {
 
 <style scoped>
 .stcakedareachart{
-    height: 100%;
-    width: 100%;
+    height: 1000px;
+    width: 450px;
 }
 </style>

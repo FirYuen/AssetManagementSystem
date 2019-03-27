@@ -70,14 +70,14 @@ export default {
   margin-right: 5px;
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
-  width: 180px;
+  width: 160px;
   min-height: 400px;
 }
 .el-menu-vertical-demo {
   width: 35px;
 }
 .el-submenu .el-menu-item {
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .hiddenDropdown,
