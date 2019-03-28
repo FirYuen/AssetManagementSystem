@@ -136,6 +136,10 @@ export default {
                   message: "提交成功!",
                   type: "success"
                 });
+                this.resetForm(formName)
+                this.formData.remark=""
+                this.dialog.show = false
+                this.$emit("updateData")
               },
               err => {
                 this.$message({

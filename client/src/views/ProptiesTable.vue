@@ -10,7 +10,7 @@
 
     <div class="tableContainer">
       <template v-if="tableData.length>0">
-        <el-table :data="tableData" style="width: 100%" max-height="530">
+        <el-table :data="tableData" style="width: 100%" max-height="530" highlight-current-row>
           <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
           <el-table-column prop="date" label="创建时间" align="center" width="190">
             <template v-slot="scope">
@@ -60,7 +60,7 @@
         </div>
       </template>
     </div>
-    <Dialog :dialog="dialog"></Dialog>
+    <Dialog :dialog="dialog" v-on:updateData="fetchData"></Dialog>
   </div>
 </template>
 
