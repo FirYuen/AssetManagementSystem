@@ -4,7 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 let types = {
-    SET_AUTHENTICATED: "SER_AUTHENTICATED",
+    SET_AUTHENTICATED: "SET_AUTHENTICATED",
     SET_USER: "SET_USER"
 }
 

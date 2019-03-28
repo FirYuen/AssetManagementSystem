@@ -60,9 +60,10 @@ export default {
       // 清除token
       localStorage.removeItem("eleToken");
       this.$store.dispatch("clearCurrentState");
+      
 
       // 页面跳转
-      this.$router.push("/login");
+      //this.$router.push("/login");
     }
   }
 };

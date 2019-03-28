@@ -17,6 +17,20 @@ export default {
   components: {
     HeadNav,
     Sidebar
+  },
+
+  methods: {
+    loginCheck() {
+      this.$axios
+        .get("/api/users/userInfo")
+        .then(result => {})
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  },
+  created() {
+    this.loginCheck();
   }
 };
 </script>

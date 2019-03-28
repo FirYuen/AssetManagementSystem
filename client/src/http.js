@@ -44,8 +44,10 @@ axios.interceptors.response.use(response => {
     }
     //Message.error(err.response.data)
     //获取错误状态码并且清除eleToken
-    let { statusCode } = err.response
-    if (statusCode !== 200) {
+   
+    let { statusCode,statusText } = err.response
+       
+    if (statusText  ===  "Unauthorized") {
         console.log(err);
         
         Message.error("登录状态异常,请重新登录");

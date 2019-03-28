@@ -22,11 +22,11 @@ const router = new Router({
             path: '/index',
             name: 'index',
             component: Index,
-            children:[
-                {path:"",component:Home},
-                {path:"/home",name:"home",component:Home},
-                {path:"/infoShow",name:"infoShow",component:InfoShow},
-                {path:"/ProptiesTable",name:"ProptiesTable",component:ProptiesTable}
+            children: [
+                { path: "", component: Home },
+                { path: "/home", name: "home", component: Home },
+                { path: "/infoShow", name: "infoShow", component: InfoShow },
+                { path: "/ProptiesTable", name: "ProptiesTable", component: ProptiesTable }
             ]
         },
         {

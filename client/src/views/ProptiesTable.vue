@@ -10,7 +10,7 @@
 
     <div class="tableContainer">
       <template v-if="tableData.length>0">
-        <el-table :data="tableData"  style="width: 100%" max-height="530">
+        <el-table :data="tableData" style="width: 100%" max-height="530">
           <el-table-column type="index" label="序号" align="center" width="50"></el-table-column>
           <el-table-column prop="date" label="创建时间" align="center" width="190">
             <template v-slot="scope">
@@ -35,7 +35,7 @@
               <span style="color:#4db3ff">{{scope.row.cash}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" align="center" width="110"></el-table-column>
+          <el-table-column prop="remark" label="备注" align="center" width="120"></el-table-column>
           <el-table-column prop="operation" label="操作" align="center" fixed="right" width="160">
             <template v-slot="scope">
               <el-button
@@ -66,26 +66,36 @@
 
 <script>
 import moment from "moment";
-import Dialog from '../components/Dialog';
+import Dialog from "../components/Dialog";
 export default {
   name: "proptiestable",
   data() {
     return {
       tableData: [],
-      dialog:{
-        title:"添加条目",
-        show:false
+      dialog: {
+        title: "添加条目",
+        show: false
       }
     };
   },
+  computed: {
+    isAuthenticated() {
+      return this.$store.state.isAuthenticated;
+    }
+  },
   created() {
     this.fetchData();
+  },
+  watch: {
+    isAuthenticated: function() {
+      console.log("login state changed");
+    }
   },
   methods: {
     fetchData() {
       //获取数据
       this.$axios
-        .get("api/profiles")
+        .get("/api/profiles")
         .then(result => {
           this.tableData = result.data;
         })
@@ -103,10 +113,10 @@ export default {
       console.log(index, row);
     },
     handleAdd() {
-      this.dialog.show = true
+      this.dialog.show = true;
     }
   },
-  components:{
+  components: {
     Dialog
   }
 };
@@ -129,7 +139,4 @@ export default {
 .title {
   font-size: 30px;
 }
-
-
-
 </style>
