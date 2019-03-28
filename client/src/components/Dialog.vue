@@ -40,7 +40,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
+        <el-button @click="resetForm('formData')">重 置</el-button>
         <el-button type="primary" @click="submitForm('formData')">确 定</el-button>
       </span>
     </el-dialog>
@@ -149,6 +149,9 @@ export default {
           return false;
         }
       });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     }
   }
 };

@@ -19,6 +19,7 @@ router.post("/add", passport.authenticate('jwt', { session: false }), (req, res)
     //res.send(req.body)
     //console.log(req.body)
     let profileFields = { ...req.body }
+    profileFields.date = Date.now()
     // if(req.body.type){
     //     profileFields.type = req.body.type
     // }
