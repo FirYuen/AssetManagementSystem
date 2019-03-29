@@ -7,6 +7,21 @@
         </el-form-item>
       </el-form>
     </el-row>
+    <el-form :inline="true">
+      <el-form-item label="按照时间筛选">
+        <el-date-picker
+          v-model="dateSelection"
+          type="datetimerange"
+          :picker-options="pickerOptions2"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right"
+        ></el-date-picker>
+      </el-form-item>
+      <el-button type="primary" @click="dateFilter" icon="search">筛选</el-button>
+      <el-button @click="clearFilter">清除筛选条件</el-button>
+    </el-form>
 
     <div class="tableContainer">
       <template v-if="tableData.length>0">
@@ -36,7 +51,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" align="center" width="120"></el-table-column>
-          <el-table-column prop="operation" label="操作" align="center" fixed="right" width="160">
+          <el-table-column prop="operation" label="操作" v-if="user.identity==='manager'" align="center" fixed="right" width="160">
             <template v-slot="scope">
               <el-button
                 size="mini"
@@ -53,6 +68,21 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-row>
+          <el-col :span="24">
+            <div class="pagination">
+              <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page.sync="paginations.page_index"
+                :page-sizes="paginations.page_sizes"
+                :page-size="paginations.page_size"
+                :layout="paginations.layout"
+                :total="paginations.total"
+              ></el-pagination>
+            </div>
+          </el-col>
+        </el-row>
       </template>
       <template v-else>
         <div class="container">
@@ -60,7 +90,7 @@
         </div>
       </template>
     </div>
-    <Dialog :dialog="dialog" v-on:updateData="fetchData"></Dialog>
+    <Dialog :dialog="dialog" :formData="formData" @updateData="fetchData"></Dialog>
   </div>
 </template>
 
@@ -71,9 +101,60 @@ export default {
   name: "proptiestable",
   data() {
     return {
+      pickerOptions2: {
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            }
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            }
+          }
+        ]
+      },
+      dateSelection: "",
+      paginations: {
+        page_index: 1, //当前页数
+        total: 0, //总数
+        page_size: 5, //一页显示多少条
+        page_sizes: [5, 10, 15, 20], //每页显示多少条
+        layout: "total,sizes,prev,pager,next,jumper" //翻页属性
+      },
       tableData: [],
+      allTableData: [],
+      filterTableData: [],
+      formData: {
+        type: "",
+        describe: "",
+        income: "",
+        spend: "",
+        cash: "",
+        remark: "",
+        _id: ""
+      },
       dialog: {
-        title: "添加条目",
+        title: "",
+        option: "",
         show: false
       }
     };
@@ -81,6 +162,9 @@ export default {
   computed: {
     isAuthenticated() {
       return this.$store.state.isAuthenticated;
+    },
+    user(){
+      return this.$store.state.user
     }
   },
   created() {
@@ -97,7 +181,9 @@ export default {
       this.$axios
         .get("/api/profiles")
         .then(result => {
-          this.tableData = result.data;
+          this.allTableData = result.data;
+          this.filterTableData = result.data;
+          this.setPaginations();
         })
         .catch(err => {
           console.log(err);
@@ -107,13 +193,92 @@ export default {
       return moment(dateStr).format("YYYY-MM-DD HH:mm:ss");
     },
     handleEdit(index, row) {
-      console.log(index, row);
+      Object.assign(this.formData, row);
+      this.parseIntSthinObject(this.formData, ["income", "spend", "cash"]);
+      this.formData.id = row._id;
+      delete this.formData._id;
+      this.dialog.option = "edit";
+      this.dialog.title = "修改条目";
+      this.dialog.show = true;
     },
     handleDelete(index, row) {
-      console.log(index, row);
+      this.$axios
+        .delete(`/api/profiles/delete/${row._id}`)
+        .then(res => {
+          this.$message("删除成功");
+          this.fetchData();
+        })
+        .catch(err => {
+          this.$message({
+            message: "提交失败!请联系管理人员!",
+            type: "error"
+          });
+        });
     },
     handleAdd() {
+      (this.formData = {
+        type: "",
+        describe: "",
+        income: "",
+        spend: "",
+        cash: "",
+        remark: "",
+        id: ""
+      }),
+        (this.dialog.option = "add");
+      this.dialog.title = "添加条目";
       this.dialog.show = true;
+    },
+
+    setPaginations() {
+      this.paginations.total = this.filterTableData.length;
+      this.paginations.page_index = 1;
+      // this.paginations.page_size = 5;
+      this.tableData = this.filterTableData.filter((item, index) => {
+        return index < this.paginations.page_size;
+      });
+    },
+    handleSizeChange(page_size) {
+      this.paginations.page_index = 1;
+      this.paginations.page_size = page_size;
+      this.tableData = this.filterTableData.filter((item, index) => {
+        return index < page_size;
+      });
+    },
+    handleCurrentChange(page) {
+      this.tableData = this.filterTableData.filter((item, index) => {
+        return (
+          this.paginations.page_size * (page - 1) - 1 < index &&
+          index < page * this.paginations.page_size
+        );
+      });
+    },
+    dateFilter() {
+      if (!this.dateSelection) {
+        this.$message({
+          message: "请选择开始和结束时间!",
+          type: "error"
+        });
+      } else {
+        Object.assign(this.filterTableData, this.allTableData);
+        this.filterTableData = this.filterTableData.filter(item => {
+          let date = new Date(item.date);
+          let time = date.getTime();
+          return time >= this.dateSelection[0] && time <= this.dateSelection[1];
+        });
+        this.setPaginations();
+      }
+    },
+    clearFilter() {
+      Object.assign(this.filterTableData, this.allTableData);
+      this.setPaginations();
+    },
+    parseIntSthinObject(obj, keyArr) {
+      keyArr.forEach((e, i) => {
+        if (obj[e] !== undefined) {
+          obj[e] = parseInt(obj[e]);
+        }
+      });
     }
   },
   components: {
@@ -138,5 +303,10 @@ export default {
 }
 .title {
   font-size: 30px;
+}
+.pagination {
+  text-align: center;
+  /* margin-top: 10px;
+  margin-right: 40px */
 }
 </style>

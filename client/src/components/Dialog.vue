@@ -4,6 +4,7 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="30%"
+      :show-close="false"
       :append-to-body="false"
     >
       <el-form
@@ -40,7 +41,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer">
-        <el-button @click="resetForm('formData')">重 置</el-button>
+        <el-button @click="dialog.show = false">取 消</el-button>
         <el-button type="primary" @click="submitForm('formData')">确 定</el-button>
       </span>
     </el-dialog>
@@ -49,6 +50,14 @@
 <script>
 export default {
   name: "Dialog",
+  computed:{
+    // IntIncome(){
+    //   console.log(typeof parseInt(this.formData.income))
+    //   console.log(parseInt(this.formData.income))
+      
+    //   return parseInt(this.formData.income)},
+    //  IntSpend(){ return parseInt(this.formData.spend)}
+  },
   data() {
     var checkNumber = (rule, value, callback) => {
       let message = {
@@ -57,6 +66,7 @@ export default {
         cash: "现金"
       };
       if (!value) {
+       
         return callback(new Error(`${message[rule.field]}不能为空`));
       }
       setTimeout(() => {
@@ -68,16 +78,6 @@ export default {
       }, 500);
     };
     return {
-      oldData: {},
-      formData: {
-        type: "",
-        describe: "",
-        income: "",
-        spend: "",
-        cash: "",
-        remark: "",
-        id: ""
-      },
       formDataType: ["提现", "充值", "转账", "优惠券", "报销"],
       formDataRules: {
         type: [
@@ -92,10 +92,10 @@ export default {
         ],
         income: [
           {
-            validator: checkNumber,
-            //  type: "number",
+            //validator: checkNumber,
+              type: "number",
             required: true,
-            // message: "请输入收入",
+             message: "请输入收入",
             trigger: "blur"
           }
         ],
@@ -117,27 +117,22 @@ export default {
     };
   },
   props: {
-    dialog: Object
+    dialog: Object,
+    formData:Object
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (JSON.stringify(this.formData) === JSON.stringify(this.oldData)) {
-            this.$message({
-              message: "当前数据未修改,请检查后再提交",
-              type: "warning"
-            });
-          } else {
-            this.oldData = JSON.parse(JSON.stringify(this.formData));
-            this.$axios.post("/api/profiles/add", this.formData).then(
+          
+          let url = this.dialog.option==="add"?"/api/profiles/add":`/api/profiles/edit/${this.formData.id}`
+            this.$axios.post(url, this.formData).then(
               res => {
                 this.$message({
                   message: "提交成功!",
                   type: "success"
                 });
-                this.resetForm(formName)
-                this.formData.remark=""
+                // this.resetForm(formName)
                 this.dialog.show = false
                 this.$emit("updateData")
               },
@@ -148,7 +143,7 @@ export default {
                 });
               }
             );
-          }
+          
         } else {
           return false;
         }
