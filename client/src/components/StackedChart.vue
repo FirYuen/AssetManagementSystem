@@ -29,7 +29,7 @@ export default {
       this.$refs.lineareachart.initChart(chartInfo);
     },
     propData(respdata) {
-      let chartData = this.chartData
+      let chartData = this.$store.getters.linechartData
       if (chartData[0].length > 20) {
         chartData.forEach((e, i) => {
           e.shift()
@@ -40,7 +40,8 @@ export default {
           e.push([respdata.xData[0], respdata.yData[i].line[0]]);
         });
       }
-      this.chartData = chartData 
+      this.chartData = chartData
+       this.$store.dispatch("setLineChartData",chartData); 
     },
     fetchData() {
       this.$axios.get("/mock/57018/api/runoffxy",{loading:false}).then(resp => {
@@ -49,14 +50,25 @@ export default {
     }
   },
   mounted() {
-    this.fetchData();
-    setTimeout(() => {
-      this.fetchData()
-    }, 1000);
+    // this.fetchData();
+    // setTimeout(() => {
+    //   this.fetchData()
+    // }, 1000);
+     this.chartData = this.$store.getters.linechartData
+    
     this.initlineareachart(this.lineareachartData.chartInfo);
 
-    setInterval(() => {
-      this.fetchData();
+   var timer =  setInterval(() => {
+     console.log(this.$route.name)
+     
+     if(this.$route.name!=="home"){
+       clearInterval(timer)
+       this.$destroy()
+     }else{
+this.fetchData();
+     }
+      
+      
     }, 5000);
   },
   components: {
